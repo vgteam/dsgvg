@@ -49,11 +49,6 @@ namespace odgi {
             snapshot_progress[0].store(true);
             // seed them with the graph order
             uint64_t len = 0;
-            // the longest path length measured in nucleotides
-            size_t longest_path_in_nucleotides = 0;
-            // the total path length in nucleotides
-            size_t total_path_len_in_nucleotides = 0;
-
             bool at_least_one_path_with_more_than_one_step = false;
 
             for (auto &path : path_sgd_use_paths) {
@@ -62,7 +57,6 @@ namespace odgi {
                     break;
                 }
             }
-
 
             if (at_least_one_path_with_more_than_one_step){
                 double w_min = (double) 1.0 / (double) (eta_max);
@@ -157,11 +151,10 @@ namespace odgi {
                             const std::uint64_t seed = 9399220 + tid;
                             XoshiroCpp::Xoshiro256Plus gen(seed); // a nice, fast PRNG
                             // some references to literal bitvectors in the path index hmmm
-                            const sdsl::bit_vector &np_bv = path_index.get_np_bv();
                             const sdsl::int_vector<> &nr_iv = path_index.get_nr_iv();
                             const sdsl::int_vector<> &npi_iv = path_index.get_npi_iv();
                             // we'll sample from all path steps
-                            std::uniform_int_distribution<uint64_t> dis_step = std::uniform_int_distribution<uint64_t>(0, np_bv.size() - 1);
+                            std::uniform_int_distribution<uint64_t> dis_step = std::uniform_int_distribution<uint64_t>(0, nr_iv.size() - 1);
                             std::uniform_int_distribution<uint64_t> flip(0, 1);
                             while (work_todo.load()) {
                                 if (!snapshot_in_progress.load()) {
@@ -218,7 +211,6 @@ namespace odgi {
                                         }
                                     } else {
                                         // sample randomly across the path
-                                        graph.get_step_count(path);
                                         std::uniform_int_distribution<uint64_t> rando(0, graph.get_step_count(path)-1);
                                         as_integers(step_b)[0] = as_integer(path);
                                         as_integers(step_b)[1] = rando(gen);
@@ -226,8 +218,8 @@ namespace odgi {
 
 
                                     // and the graph handles, which we need to record the update
-                                    handle_t term_i = path_index.get_handle_of_step(step_a);
-                                    handle_t term_j = path_index.get_handle_of_step(step_b);
+                                    handle_t term_i = graph.get_handle_of_step(step_a);
+                                    handle_t term_j = graph.get_handle_of_step(step_b);
                                     uint64_t term_i_length = graph.get_length(term_i);
                                     uint64_t term_j_length = graph.get_length(term_j);
 
