@@ -35,6 +35,12 @@ void to_tsv(std::ostream &out, const std::vector<double> &X, const std::vector<d
 
 }
 
+double coord_dist(xy_d_t point1, xy_d_t point2) {
+    double dx = point1.x - point2.x;
+    double dy = point1.y - point2.y;
+    return sqrt(dx * dx + dy * dy);
+}
+
 Layout::Layout(const std::vector<double> &X, const std::vector<double> &Y) {
     std::vector<uint64_t> vals;
     //assert(X.size)( == Y.size());

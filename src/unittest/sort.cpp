@@ -217,6 +217,8 @@ TEST_CASE("Sorting a graph with paths 1 node long", "[sort]") {
             false,
             path_sgd_seed,
             false,
+            "",
+            false,
             ""
     );
 

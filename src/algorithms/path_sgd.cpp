@@ -478,7 +478,9 @@ namespace odgi {
                                                     const bool &progress,
                                                     const std::string &seed,
                                                     const bool &snapshot,
-                                                    const std::string &snapshot_prefix) {
+                                                    const std::string &snapshot_prefix,
+                                                    const bool &write_layout,
+                                                    const std::string &layout_out) {
             std::vector<string> snapshots;
             std::vector<double> layout = path_linear_sgd(graph,
                                                          path_index,
@@ -609,6 +611,25 @@ namespace odgi {
                                      || (a.pos == b.pos
                                          && as_integer(a.handle) < as_integer(b.handle)));
                       });
+            if (write_layout) {
+                std::vector<double> dummy_vec(handle_layout.size() * 2, 0.0);
+                std::vector<double> sorted_layout(handle_layout.size() * 2);
+                for (uint64_t i = 0; i < handle_layout.size(); i++) {
+                    uint64_t idx = i * 2;
+                    double layout_start_pos = handle_layout[i].pos;
+                    // we set the start position in 1D
+                    sorted_layout[idx] = layout_start_pos;
+                    // we assume that in 1D we can just travel the length of the node in nucleotides also in 1D
+                    sorted_layout[idx + 1] = (double) layout_start_pos + (double) graph.get_length(handle_layout[i].handle);
+                    // std::cerr << std::fixed;
+                    // std::cerr << std::setprecision(3);
+                    // std::cerr << "start_pos-end_pos: " << "\t" << sorted_layout[i] << "-" << sorted_layout[i + 1] << std::endl;
+                }
+                algorithms::layout::Layout lay(sorted_layout, dummy_vec);
+                ofstream f(layout_out.c_str());
+                lay.serialize(f);
+                f.close();
+            }
             std::vector<handle_t> order;
             order.reserve(graph.get_node_count());
             for (auto &layout_handle : handle_layout) {

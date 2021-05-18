@@ -2,15 +2,12 @@
 #include "odgi.hpp"
 #include "args.hxx"
 #include "algorithms/topological_sort.hpp"
-#include "algorithms/eades_algorithm.hpp"
 #include "algorithms/cycle_breaking_sort.hpp"
 #include "algorithms/id_ordered_paths.hpp"
 #include "algorithms/dagify.hpp"
 #include "algorithms/split_strands.hpp"
 #include "algorithms/dagify_sort.hpp"
 #include "algorithms/random_order.hpp"
-#include "algorithms/mondriaan_sort.hpp"
-#include "algorithms/linear_sgd.hpp"
 #include "algorithms/xp.hpp"
 #include "algorithms/path_sgd.hpp"
 #include "algorithms/groom.hpp"
@@ -65,6 +62,7 @@ int main_sort(int argc, char** argv) {
     args::ValueFlag<uint64_t> p_sgd_zipf_max_number_of_distributions(parser, "N", "approximate maximum number of Zipfian distributions to calculate (default: 100)", {'y', "path-sgd-zipf-max-num-distributions"});
     args::ValueFlag<std::string> p_sgd_seed(parser, "STRING", "set the base seed for the 1-threaded path guided linear 1D SGD model (default: pangenomic!)", {'q', "path-sgd-seed"});
     args::ValueFlag<std::string> p_sgd_snapshot(parser, "STRING", "set the prefix to which each snapshot graph of a path guided 1D SGD iteration should be written to, no default", {'u', "path-sgd-snapshot"});
+    args::ValueFlag<std::string> p_sgd_layout(parser, "STRING", "write the layout of a sorted, path guided 1D SGD graph to this file, no default", {'e', "path-sgd-layout"});
     /// pipeline
     args::ValueFlag<std::string> pipeline(parser, "STRING", "apply a series of sorts, based on single-character command line arguments to this command, adding 's' as the default topological sort, 'f' to reverse the sort order, and 'g' to apply graph grooming", {'p', "pipeline"});
     /// paths
@@ -195,6 +193,10 @@ int main_sort(int argc, char** argv) {
     if (snapshot) {
         snapshot_prefix = args::get(p_sgd_snapshot);
     }
+    std::string layout_out;
+    if (p_sgd_layout) {
+        layout_out = args::get(p_sgd_layout);
+    }
     if (p_sgd || args::get(pipeline).find('Y') != std::string::npos) {
         // take care of path index
         if (xp_in_file) {
@@ -308,7 +310,9 @@ int main_sort(int argc, char** argv) {
                                                       progress,
                                                       path_sgd_seed,
                                                       snapshot,
-                                                      snapshot_prefix);
+                                                      snapshot_prefix,
+                                                      p_sgd_layout,
+                                                      layout_out);
             graph.apply_ordering(order, true);
         } else if (args::get(breadth_first)) {
             graph.apply_ordering(algorithms::breadth_first_topological_order(graph, bf_chunk_size), true);
@@ -326,9 +330,6 @@ int main_sort(int argc, char** argv) {
                         break;
                     case 'n':
                         order = algorithms::topological_order(&graph, false, false, args::get(progress));
-                        break;
-                    case 'e':
-                        order = algorithms::eades_algorithm(&graph);
                         break;
                     case 'd': {
                         graph_t split, into;
@@ -372,7 +373,9 @@ int main_sort(int argc, char** argv) {
                                                                   progress,
                                                                   path_sgd_seed,
                                                                   snapshot,
-                                                                  snapshot_prefix);
+                                                                  snapshot_prefix,
+                                                                  p_sgd_layout,
+                                                                  layout_out);
                         break;
                     }
                     case 'f':

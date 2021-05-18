@@ -21,6 +21,7 @@
 #include "dirty_zipfian_int_distribution.h"
 #include "XoshiroCpp.hpp"
 #include "progress.hpp"
+#include "algorithms/layout.hpp"
 
 #include <fstream>
 
@@ -78,7 +79,9 @@ std::vector<handle_t> path_linear_sgd_order(const graph_t &graph,
                                             const bool &progress,
                                             const std::string &seed,
                                             const bool &snapshot,
-                                            const std::string &snapshot_prefix);
+                                            const std::string &snapshot_prefix,
+                                            const bool &write_layout,
+                                            const std::string &layout_out);
 
 }
 
