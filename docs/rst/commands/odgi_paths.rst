@@ -41,6 +41,9 @@ Path Investigation Options
 | Print the paths in the graph to stdout. Each path is printed in its
   own line.
 
+| **-l, --list-paths-start-end**
+| If **-L,--list-paths** was specified, this additionally prints the start and end positions of each path in additional, tab-delimited coloumns.
+
 | **-H, --haplotypes**
 | Print to stdout the paths in an approximate binary haplotype matrix
   based on the graph’s sort order. The output is tab-delimited:

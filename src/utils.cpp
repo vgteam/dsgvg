@@ -81,4 +81,17 @@ namespace utils {
 		}
 		return 0;
     }
+
+	double median_of_sorted_vec(const std::vector<uint64_t>& vec) {
+    	size_t vec_size = vec.size();
+    	if (vec_size == 0) {
+    		return 0.0; // we don't know really, but let's keep things simple
+    	} else {
+    		if (vec_size % 2 == 0) {
+    			return ((double)vec[vec_size / 2 - 1] + (double) vec[vec_size / 2]) / 2.0;
+    		} else {
+    			return (double)vec[vec_size / 2];
+    		}
+    	}
+    }
 }

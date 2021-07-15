@@ -15,6 +15,7 @@ namespace utils {
 	bool ends_with(const std::string &fullString, const std::string &ending);
 	int handle_gfa_odgi_input(const std::string infile, const std::string subcommmand_name, const bool progress,
 							  const uint64_t num_threads, odgi::graph_t &graph);
+	double median_of_sorted_vec(const std::vector<uint64_t>& vec);
 }
 
 

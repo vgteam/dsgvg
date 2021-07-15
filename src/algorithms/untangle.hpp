@@ -99,7 +99,8 @@ void untangle(
     const std::vector<path_handle_t>& queries,
     const std::vector<path_handle_t>& targets,
     const uint64_t& merge_dist,
-    const size_t& num_threads);
+    const size_t& num_threads,
+    const bool progress);
 
 }
 }

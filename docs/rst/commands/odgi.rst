@@ -75,6 +75,8 @@ input_graphs.txt -o graphs.og
 
 :ref:`odgi test`
 
+:ref: `odgi tips` -i graph.og -q "query_name"
+
 :ref:`odgi unchop` -i graph.og -o
 graph.unchopped.og
 
@@ -325,6 +327,18 @@ multiple graphs into the same file.
   odgi. For targeted testing, a subset of tests can be selected. odgi
   test depends on `Catch2 <https://github.com/catchorg/Catch2>`__. In
   the default setting, all results are printed to stdout.
+
+| **odgi tips** [**-i, --input**\ =\ *FILE*] [*OPTION*]…
+| The odgi tips command identifies break point positions relative to given query (reference) path(s) of all the tips in
+the graph or of tips of given path(s). Prints BED records to stdout. Each record consists of:
+
+- **chrom**: The query path name.
+- **start**: The 0-based start position of the query we hit in the node.
+- **end**: The 1-based end position of the query we hit in the node.
+- **median_range**: The 0-based median of the whole query path range of the node we hit. It is possible that a node contains several steps, so we want to mirror that here.
+- **path**: The name of the path we walked.
+- **path_pos**: The 0-based position of the path we walked when we hit the node of the query path.
+- **walk_from_front**: If `1` we walked from the front of the target path. Else it is `0`.
 
 | **odgi unchop** [**-i, --idx**\ =\ *FILE*] [**-o, --out**\ =\ *FILE*]
   [*OPTION*]…

@@ -31,6 +31,8 @@ int main_paths(int argc, char** argv) {
                                                                " be calculated and printed to stdout.", {'O', "overlaps"});
     args::Flag list_names(path_investigation_opts, "list-names", "Print the paths in the graph to stdout. Each path is printed in its"
                                                 " own line.", {'L', "list-paths"});
+	args::Flag list_path_start_end(path_investigation_opts, "list-path-start-end", "If -L,--list-paths was specified, this additionally prints the start and end positions of each path in additional, tab-delimited coloumns."
+						   , {'l', "list-path-start-end"});
     args::ValueFlag<std::string> path_delim(path_investigation_opts, "CHAR", "The part of each path name before this delimiter CHAR is a group"
                                                                              " identifier. This parameter should only be set in combination with"
                                                                              " **-H, --haplotypes**. Prints an additional, first column"
@@ -70,6 +72,11 @@ int main_paths(int argc, char** argv) {
         return 1;
     }
 
+	if (list_path_start_end && !list_names) {
+		std::cerr << "[odgi::paths] error: please specify also -L,--list-path with the -l,--list-path-start-end option!" << std::endl;
+		return 1;
+	}
+
 	const uint64_t num_threads = args::get(threads) ? args::get(threads) : 1;
     omp_set_num_threads(num_threads);
 
@@ -84,8 +91,22 @@ int main_paths(int argc, char** argv) {
         }
     }
 
-    //args::Flag list_names(parser, "list-names", "list the paths in the graph", {'L', "list-paths"});
-    if (args::get(list_names)) {
+    if (list_path_start_end && list_names) {
+    	std::vector<path_handle_t> paths;
+		graph.for_each_path_handle([&](const path_handle_t& p) {
+			paths.push_back(p);
+		});
+#pragma omp parallel for schedule(dynamic, 1) num_threads(num_threads)
+		for (auto path : paths) {
+			uint64_t path_len = 0;
+			graph.for_each_step_in_path(path, [&](const step_handle_t& s) {
+				handle_t h = graph.get_handle_of_step(s);
+				path_len += graph.get_length(h);
+			});
+#pragma omp critical (cout)
+			std::cout << graph.get_path_name(path) << "\t" << 1 << "\t" << path_len << std::endl;
+		}
+	} else if (args::get(list_names)) {
         graph.for_each_path_handle([&](const path_handle_t& p) {
                 std::cout << graph.get_path_name(p) << std::endl;
             });

@@ -45,7 +45,8 @@ typedef boomphf::mphf<step_handle_t, step_handle_hasher_t> boophf_step_t;
 struct step_index_t {
     step_index_t(const PathHandleGraph& graph,
                  const std::vector<path_handle_t>& paths,
-                 const uint64_t& nthreads);
+                 const uint64_t& nthreads,
+                 const bool progress);
     ~step_index_t(void);
     const uint64_t& get_position(const step_handle_t& step);
     boophf_step_t* step_mphf = nullptr;

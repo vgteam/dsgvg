@@ -170,7 +170,8 @@ int main_untangle(int argc, char **argv) {
                              query_paths,
                              target_paths,
                              args::get(merge_dist),
-                             num_threads);
+                             num_threads,
+                             progress);
     }
 
     return 0;
